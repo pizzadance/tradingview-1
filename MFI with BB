@@ -15,7 +15,8 @@ study(title="MFI with BB", shorttitle="MFI with BB", precision=0)
 t = tickerid(syminfo.prefix, ticker)
 realhlc3 = security(t, period, hlc3)
 realclose = security(t, period, close)
-length = input(8, minval=1, title="MFI Length")
+fixlen = input(8, minval=1, title="MFI Fixed Length")
+useavg = input(true, title="Average MFI?(Fixed)")
 ribsig = input(true, title="Ribbon signal?")
 siglen = input(21, minval=1, title="Fixed SigLen")
 mult = input(2.0, minval=0.001, maxval=50)
@@ -28,16 +29,21 @@ offsets = 0.85
 sigmas = 6
 offset = 0.75
 sigma = 4
-
+ 
 // MFI
 emeefei(_length)=>
     upper_s = sum(volume * (change(realhlc3) <= 0 ? 0 : realhlc3), _length)
     lower_s = sum(volume * (change(realhlc3) >= 0 ? 0 : realhlc3), _length)
     mr = upper_s/lower_s
     _mf = 100- ( 100/(1+mr))
-mflen = emeefei(length)
-mf = smooth ? alma(mflen, 3, offsets, sigmas) : mflen
-
+mflen = emeefei(fixlen)
+mf1 = emeefei(8)
+mf2 = emeefei(10)
+mf3 = emeefei(12)
+mf4 = emeefei(14)
+mf5 = emeefei(16)
+mf = useavg ? avg(mf1,mf2,mf3,mf4,mf5) : smooth ? alma(mflen, 3, offsets, sigmas) : mflen
+forsig = useavg ? avg(mf1,mf2,mf3,mf4,mf5) : mflen
 //Price condiction
 threshold = alma(realclose, 21, 0.75, 4)
 triggerup = realclose > threshold
@@ -70,10 +76,9 @@ calcsig(sigsrc)=>
     ma3 = alma(sigsrc,13, offsets, sigmas)
     ma4 = alma(sigsrc,21, offsets, sigmas)
     ma5 = alma(sigsrc,34, offsets, sigmas)
-    ma6 = alma(sigsrc,55, offsets, sigmas)
-    _signal = (ma1+ma2+ma3+ma4+ma5+ma6)/6
+    _signal = avg(ma1,ma2,ma3,ma4,ma5)
 //end Signal calculation
-mfisig = calcsig(mflen)
+mfisig = calcsig(forsig)
 signal = ribsig ? mfisig : alma(mf, siglen, sigma, offset)
 hist = mf - signal
 histcolor = hist > 0 ? green : red
