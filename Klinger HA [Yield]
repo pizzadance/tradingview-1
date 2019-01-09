@@ -16,7 +16,6 @@ showxo = input(false, type=bool, title="Show 0 crossings?")
 showsignal = input(false, type=bool, title="Show signal?")
 showt2 = input(true, type=bool, title="Show circles?")
 showt3 = input(true, type=bool, title="Show triangles?")
-showhist = input(false, type=bool, title="Show histogram?")
 usezero = input(true, type=bool, title="Zero as pivot?")
 useavg = input(true, type=bool, title="Signal Ribbon?")
 //Short lenght period
@@ -74,19 +73,19 @@ ma_signal = (ma0+ma1+ma2+ma3+ma4+ma5+ma6)/7
 
 signal = ma_signal
 
-hist = usezero ? kvo_line : kvo_line - signal
+hist = kvo_line
 
 baseline = 0
 //histogram colors red
-color1 = #800000
-color2 = #CD5C5C
+color1 = #800000 // maroon (weak hist)
+color2 = #CD5C5C // IndianRed (strong hist)
 //histogram colors green
-color3 = #006400
-color4 = #3CB371
+color3 = #006400 //DarkGreen
+color4 = #3CB371 //MediumSeaGreen
 
 //klinger colors
-color5 = #FF0000
-color6 = #00FF00
+color5 = #FF0000 //red1
+color6 = #00FF00 //lime
 
 abovezero = crossover(kvo_line, 0)
 belowzero = crossunder(kvo_line, 0)
@@ -112,7 +111,6 @@ crossing_u = crossover(kvo_line, 0)
 crossing_d = crossunder(kvo_line, 0)
 
 hline(0, 'Zero', linestyle=dashed, linewidth=1, color=#7B68EE, editable=false)
-plot(showhist ? hist : na, color = kvo_color, transp=0, linewidth=4, title="Klinger Histogram", editable=true, style=histogram)
 kvop=plot(kvo, color = kvo_color, transp=0, linewidth=2, title="Klinger Volume", editable=true, style=columns)
 sigp=plot(showsignal ? signal : na, color = signal_color, transp=0, linewidth=2, title="Signal", editable=true, style=line)
 
