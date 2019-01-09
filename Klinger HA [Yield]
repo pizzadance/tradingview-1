@@ -11,17 +11,16 @@
 //contact: bucket@mailbox.org
 //created by Yield
 
-
-//Klinger with HA candle differentiation
-study(title="Klinger Chomusuke [Yield]", shorttitle="Klinger HA [Yield]", precision=0)
-showxo = input(false, type=bool, title="Show signal crossings?")
+study(title="Klinger Regression", shorttitle="Klinger Regression", precision=0)
+showxo = input(false, type=bool, title="Show 0 crossings?")
+showsignal = input(false, type=bool, title="Show signal?")
 showt2 = input(true, type=bool, title="Show circles?")
 showt3 = input(true, type=bool, title="Show triangles?")
-showhist = input(true, type=bool, title="Show histogram?")
-usezero = input(false, type=bool, title="Zero as pivot?")
+showhist = input(false, type=bool, title="Show histogram?")
+usezero = input(true, type=bool, title="Zero as pivot?")
+useavg = input(true, type=bool, title="Signal Ribbon?")
 //Short lenght period
 fastp = 33
-
 offset = input(0.85, step=0.05, minval=0.1, maxval=1)
 sigma = input(9, step=1, minval=1)
 
@@ -33,7 +32,6 @@ realO = security(t, period, open)
 realH = security(t, period, high)
 realL = security(t, period, low)
 realC = security(t, period, close)
-price = realC
 
 //Heikin Ashi code --> haclose, haopen, hahigh, halow
 haopen   = 0.0
@@ -43,8 +41,6 @@ hahigh   = max(realH, max(haopen, haclose))
 halow    = min(realL,  min(haopen, haclose))
 pujitos = (haclose < haopen) and (haclose < haclose[1]) ? red : (haclose > haopen) and (haclose > haclose[1]) ? green : haclose > haopen ? fuchsia : haclose < haopen ? yellow : na
 warn1 = pujitos == red and (pujitos[1] == fuchsia or pujitos[1] == green)
-//plotshape(showsr and pujitos == yellow, style = shape.triangleup, location = location.belowbar, color = pujitos, size=size.tiny, transp=0, title="Yellow")
-//plotshape(showsr and pujitos == fuchsia, style = shape.triangledown, location = location.abovebar, color = pujitos, size=size.tiny, transp=0, title="Fuchsia")
 //Heikin Ashi code
 
 //KAMA
@@ -74,20 +70,23 @@ ma3 = alma(kvo_line,13, offsets, sigmas)
 ma4 = alma(kvo_line,21, offsets, sigmas)
 ma5 = alma(kvo_line,34, offsets, sigmas)
 ma6 = alma(kvo_line,55, offsets, sigmas)
-signal = (ma0+ma1+ma2+ma3+ma4+ma5+ma6)/7
+ma_signal = (ma0+ma1+ma2+ma3+ma4+ma5+ma6)/7
+
+signal = ma_signal
+
 hist = usezero ? kvo_line : kvo_line - signal
 
 baseline = 0
 //histogram colors red
-color1 = #800000 // maroon (weak hist)
-color2 = #CD5C5C // IndianRed (strong hist)
+color1 = #800000
+color2 = #CD5C5C
 //histogram colors green
-color3 = #006400 //DarkGreen
-color4 = #3CB371 //MediumSeaGreen
+color3 = #006400
+color4 = #3CB371
 
 //klinger colors
-color5 = #FF0000 //red1
-color6 = #00FF00 //lime
+color5 = #FF0000
+color6 = #00FF00
 
 abovezero = crossover(kvo_line, 0)
 belowzero = crossunder(kvo_line, 0)
@@ -105,7 +104,7 @@ histpositive = hist >= 0
 kvo_color = histnegative and histstrong ? color1 : histnegative and histweak ? color2 : histpositive and histstrong ? color4 : color3
 
 kvo = kvo_line
-xcolor = kvo_line < signal ? color5 : color6
+xcolor = kvo_line < 0 ? color5 : color6
 
 signal_color = #FF8C00
 
@@ -114,11 +113,8 @@ crossing_d = crossunder(kvo_line, 0)
 
 hline(0, 'Zero', linestyle=dashed, linewidth=1, color=#7B68EE, editable=false)
 plot(showhist ? hist : na, color = kvo_color, transp=0, linewidth=4, title="Klinger Histogram", editable=true, style=histogram)
-kvop=plot(kvo, color = xcolor, transp=0, linewidth=2, title="Klinger Volume", editable=false, style=line)
-sigp=plot(signal, color = signal_color, transp=0, linewidth=2, title="Signal", editable=false, style=line)
-//fill(kvop, sigp, color=kvo_color, transp=30, editable=false)
-plotshape(showxo ? crossing_u : na, title="Dot mark Up", style=shape.arrowup, location=location.top, color=color6, transp=0, size=size.tiny, editable=false)
-plotshape(showxo ? crossing_d : na, title="Dot mark Down", style=shape.arrowdown, location=location.bottom, color=color5, transp=0, size=size.tiny, editable=false)
+kvop=plot(kvo, color = kvo_color, transp=0, linewidth=2, title="Klinger Volume", editable=true, style=columns)
+sigp=plot(showsignal ? signal : na, color = signal_color, transp=0, linewidth=2, title="Signal", editable=true, style=line)
 
 plotshape(showt2 and (kvo > 0 and xcolor == color6) ? pujitos == fuchsia and kvo_color == color3 : na, title="testf1", style=shape.circle, location=location.top, color=orange, transp=0, size=size.tiny, editable=false)
 plotshape(showt2 and (kvo > 0 and xcolor == color6) ? pujitos == fuchsia and kvo_color == color2 : na, title="testf2", style=shape.circle, location=location.top, color=purple, transp=0, size=size.tiny, editable=false)
@@ -128,7 +124,6 @@ plotshape(showt3 and (kvo < 0 and xcolor == color5) ? pujitos == yellow and kvo_
 
 plotshape(warn1 and (kvo_line > signal and kvo_line > 0), title="flips", style=shape.arrowdown, location=location.top, color=orange, transp=0, size=size.tiny, editable=false)
 
-alertcondition(crossover(kvo_line, signal), title='KVO TUP', message='KVO above trend')
-alertcondition(crossunder(kvo_line, signal), title='KVO TDN', message='KVO below trend')
-alertcondition(crossover(kvo_line, 0), title='KVO Up', message='KVO above zero')
-alertcondition(crossunder(kvo_line, 0), title='KVO Down', message='KVO below zero')
+plotshape(showxo ? crossing_u : na, title="Dot mark Up", style=shape.arrowup, location=location.top, color=color6, transp=0, size=size.tiny, editable=false)
+plotshape(showxo ? crossing_d : na, title="Dot mark Down", style=shape.arrowdown, location=location.bottom, color=color5, transp=0, size=size.tiny, editable=false)
+alertcondition(crossunder(kvo_line,0), title='KVO down', message='KVO down')
