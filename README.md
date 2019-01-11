@@ -9,4 +9,4 @@ Bitcoin: 3F636VrPCdnbfrdP5kS4C6fHWVBffXNKCu\
 Litecoin: 33932ckE7i3oAQZxxSgLcvmbn8RAgTc2tk\
 ETH: 0x53A43EF9E56908A9c868FBf2f1b9DE7B3486FDAF\
 contact: bucket@mailbox.org\
-created by Yield\
+created by Yield
