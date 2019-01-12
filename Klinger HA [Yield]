@@ -39,7 +39,6 @@ haopen  := na(haopen[1]) ? (realO + realC)/2 : (haopen[1] + haclose[1]) / 2
 hahigh   = max(realH, max(haopen, haclose))
 halow    = min(realL,  min(haopen, haclose))
 pujitos = (haclose < haopen) and (haclose < haclose[1]) ? red : (haclose > haopen) and (haclose > haclose[1]) ? green : haclose > haopen ? fuchsia : haclose < haopen ? yellow : na
-warn1 = pujitos == red and (pujitos[1] == fuchsia or pujitos[1] == green)
 //Heikin Ashi code
 
 //KAMA
@@ -119,8 +118,6 @@ plotshape(showt2 and (kvo > 0 and xcolor == color6) ? pujitos == fuchsia and kvo
 
 plotshape(showt3 and (kvo < 0 and xcolor == color5) ? pujitos == yellow and kvo_color == color1 : na, title="triangle1", style=shape.triangleup, location=location.bottom, color=green, transp=0, size=size.tiny, editable=false)
 plotshape(showt3 and (kvo < 0 and xcolor == color5) ? pujitos == yellow and kvo_color == color2 : na, title="triangle2", style=shape.triangleup, location=location.bottom, color=green, transp=0, size=size.tiny, editable=false)
-
-plotshape(warn1 and (kvo_line > signal and kvo_line > 0), title="flips", style=shape.arrowdown, location=location.top, color=orange, transp=0, size=size.tiny, editable=false)
 
 plotshape(showxo ? crossing_u : na, title="Dot mark Up", style=shape.arrowup, location=location.top, color=color6, transp=0, size=size.tiny, editable=false)
 plotshape(showxo ? crossing_d : na, title="Dot mark Down", style=shape.arrowdown, location=location.bottom, color=color5, transp=0, size=size.tiny, editable=false)
