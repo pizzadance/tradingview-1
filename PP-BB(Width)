@@ -11,7 +11,7 @@
 //contact: bucket@mailbox.org
 //created by Yield
 
-study(title="%BB and BB Width", precision=1, overlay=false)
+study(title="%BB and BB Width", shorttitle="%BB/BBW [Yield]", precision=1, overlay=false)
 t = tickerid(syminfo.prefix, ticker)
 src = security(t, period, close)
 showxo = input(false, title="Show crossings?", type=bool)
