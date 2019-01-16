@@ -11,7 +11,7 @@
 //contact: bucket@mailbox.org
 //created by Yield
 
-study(title="MFI with BB", shorttitle="MFI with BB", precision=0)
+study(title="MFI with BB [Yield]", shorttitle="MFI with BB [Yield]", precision=0)
 t = tickerid(syminfo.prefix, ticker)
 realhlc3 = security(t, period, hlc3)
 realclose = security(t, period, close)
